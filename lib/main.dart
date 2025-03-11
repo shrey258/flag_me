@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'config/supabase_config.dart';
 import 'utils/responsive_helper.dart';
 import 'providers/navigation_provider.dart';
+import 'providers/auth_provider.dart';
+import 'screens/auth_screen.dart';
 import 'screens/add_occasion_screen.dart';
 import 'screens/occasion_details_screen.dart';
 import 'screens/settings_screen.dart';
@@ -16,15 +21,30 @@ import 'providers/occasions_provider.dart';
 import 'models/occasion.dart';
 
 void main() async {
-  tz.initializeTimeZones();
-  runApp(const ProviderScope(child: MyApp()));
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+    await dotenv.load();
+    
+    await Supabase.initialize(
+      url: SupabaseConfig.url,
+      anonKey: SupabaseConfig.anonKey,
+    );
+    
+    tz.initializeTimeZones();
+    runApp(const ProviderScope(child: MyApp()));
+  } catch (e) {
+    print('Error loading environment: $e');
+  }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    
     return MaterialApp(
       title: 'Flag Me',
       scrollBehavior: const MaterialScrollBehavior().copyWith(
@@ -57,7 +77,10 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: switch (authState) {
+        Authenticated _ => const MainScreen(),
+        _ => const AuthScreen(),
+      },
     );
   }
 }

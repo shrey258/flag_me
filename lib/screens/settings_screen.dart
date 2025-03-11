@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../utils/responsive_helper.dart';
 import '../widgets/hero_card.dart';
+import '../providers/auth_provider.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _emailNotifications = false;
   String _reminderTime = '1 week';
@@ -99,6 +101,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onChanged: (value) {
                               if (value != null) {
                                 setState(() => _reminderTime = value);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ResponsiveHelper.isMobile(context) ? 24 : 32,
+                      ),
+                      _buildSection(
+                        context,
+                        title: 'Account',
+                        icon: Icons.account_circle_outlined,
+                        children: [
+                          ListTile(
+                            title: Text(
+                              'Sign Out',
+                              style: GoogleFonts.poppins(
+                                fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                            leading: Icon(
+                              Icons.logout_rounded,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            onTap: () async {
+                              final shouldLogout = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text(
+                                    'Sign Out',
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  content: Text(
+                                    'Are you sure you want to sign out?',
+                                    style: GoogleFonts.inter(),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context, false),
+                                      child: Text(
+                                        'Cancel',
+                                        style: GoogleFonts.poppins(
+                                          color: Theme.of(context).colorScheme.secondary,
+                                        ),
+                                      ),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(context, true),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: Theme.of(context).colorScheme.error,
+                                      ),
+                                      child: Text(
+                                        'Sign Out',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (shouldLogout == true) {
+                                try {
+                                  await ref.read(authStateProvider.notifier).signOut();
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to sign out: $e'),
+                                        backgroundColor: Theme.of(context).colorScheme.error,
+                                      ),
+                                    );
+                                  }
+                                }
                               }
                             },
                           ),
@@ -199,31 +280,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required List<String> items,
     required ValueChanged<String?> onChanged,
   }) {
-    return Padding(
-      padding: EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 16 : 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          DropdownButton<String>(
-            value: value,
-            items:
-                items.map((String item) {
-                  return DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(item),
-                  );
-                }).toList(),
-            onChanged: onChanged,
-          ),
-        ],
+    return ListTile(
+      title: Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      trailing: DropdownButton<String>(
+        value: value,
+        items: items.map((item) {
+          return DropdownMenuItem(
+            value: item,
+            child: Text(item),
+          );
+        }).toList(),
+        onChanged: onChanged,
       ),
     );
   }
