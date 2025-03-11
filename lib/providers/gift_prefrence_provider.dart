@@ -11,7 +11,7 @@ class GiftPreferenceNotifier extends StateNotifier<List<GiftPreference>> {
 
   GiftPreference? getPreferenceByOccasionId(String occasionId) {
     try {
-      return state.firstWhere((pref) => pref.occasionId == occasionId);
+      return state.firstWhere((pref) => pref.occasion == occasionId);
     } catch (e) {
       return null;
     }
@@ -27,7 +27,7 @@ final preferenceByOccasionProvider = Provider.family<GiftPreference?, String>(
   (ref, occasionId) {
     final preferences = ref.watch(giftPreferenceProvider);
     try {
-      return preferences.firstWhere((pref) => pref.occasionId == occasionId);
+      return preferences.firstWhere((pref) => pref.occasion == occasionId);
     } catch (e) {
       return null;
     }

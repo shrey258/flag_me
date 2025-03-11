@@ -6,9 +6,9 @@ import '../utils/responsive_helper.dart';
 import '../providers/occasions_provider.dart';
 import '../models/reminder.dart';
 import '../models/enums.dart';
-import 'gift_prefrence_screen.dart';
 import '../widgets/hero_card.dart';
 import '../models/occasion.dart';
+import 'gift_preferences_screen.dart';
 
 class OccasionDetailsScreen extends ConsumerWidget {
   final String occasionId;
@@ -58,14 +58,10 @@ class OccasionDetailsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildOccasionHeader(context, occasion),
-                      SizedBox(
-                        height: ResponsiveHelper.isMobile(context) ? 24 : 32,
-                      ),
+                      const SizedBox(height: 32),
                       _buildDetailsSection(context, occasion),
-                      SizedBox(
-                        height: ResponsiveHelper.isMobile(context) ? 24 : 32,
-                      ),
-                      _buildGiftSuggestions(context),
+                      const SizedBox(height: 32),
+                      _buildGiftSuggestions(context, occasion),
                     ],
                   ),
                 ),
@@ -73,54 +69,6 @@ class OccasionDetailsScreen extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primary.withOpacity(0.8),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => GiftPreferenceScreen(
-                  occasionId: occasion.id,
-                  relationType: occasion.relationType,
-                ),
-              ),
-            );
-          },
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          label: Row(
-            children: [
-              Icon(Icons.card_giftcard, color: Colors.black),
-              SizedBox(width: 8),
-              Text(
-                'Select Gift',
-                style: GoogleFonts.poppins(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -185,6 +133,128 @@ class OccasionDetailsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildGiftSuggestions(BuildContext context, Occasion occasion) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gift Ideas',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontSize: ResponsiveHelper.isMobile(context) ? 20 : 24,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildGiftCard(context, occasion),
+      ],
+    );
+  }
+
+  Widget _buildGiftCard(BuildContext context, Occasion occasion) {
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).colorScheme.tertiary,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.card_giftcard,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Find the Perfect Gift',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Get personalized gift suggestions based on interests and preferences.',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GiftPreferencesScreen(
+                      occasionId: occasion.id,
+                      occasion: occasion.description,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Find Gift Ideas'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String value,
+  }) {
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Text(
+                    value,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      fontSize: ResponsiveHelper.isMobile(context) ? 14 : 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _formatDate(DateTime date) {
     final months = [
       'January',
@@ -200,7 +270,6 @@ class OccasionDetailsScreen extends ConsumerWidget {
       'November',
       'December',
     ];
-
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
@@ -214,7 +283,7 @@ class OccasionDetailsScreen extends ConsumerWidget {
     } else if (difference.inDays > 0) {
       return '${difference.inDays} ${difference.inDays == 1 ? 'day' : 'days'} away';
     } else if (difference.inDays == 0) {
-      return 'Today!';
+      return 'Today';
     } else {
       return 'Past';
     }
@@ -223,9 +292,7 @@ class OccasionDetailsScreen extends ConsumerWidget {
   String _getNextReminder(List<Reminder> reminders) {
     final now = DateTime.now();
     final upcomingReminders = reminders
-        .where(
-          (reminder) => reminder.date.isAfter(now) && reminder.isActive,
-        )
+        .where((reminder) => reminder.date.isAfter(now))
         .toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
@@ -234,113 +301,14 @@ class OccasionDetailsScreen extends ConsumerWidget {
     }
 
     final nextReminder = upcomingReminders.first;
-    return _formatDate(nextReminder.date);
-  }
+    final difference = nextReminder.date.difference(now);
 
-  Widget _buildDetailCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String value,
-  }) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 16 : 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary),
-          SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.bodyMedium),
-              Text(
-                value,
-                style: GoogleFonts.poppins(
-                  fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGiftSuggestions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Gift Suggestions',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: ResponsiveHelper.isMobile(context) ? 20 : 24,
-          ),
-        ),
-        SizedBox(height: 16),
-        if (ResponsiveHelper.isMobile(context))
-          Column(children: [_buildGiftCard(context), _buildGiftCard(context)])
-        else
-          Row(
-            children: [
-              Expanded(child: _buildGiftCard(context)),
-              SizedBox(width: 16),
-              Expanded(child: _buildGiftCard(context)),
-            ],
-          ),
-      ],
-    );
-  }
-
-  Widget _buildGiftCard(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      padding: EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 16 : 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Watch',
-            style: GoogleFonts.poppins(
-              fontSize: ResponsiveHelper.isMobile(context) ? 18 : 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text('Fossil Gen 6', style: Theme.of(context).textTheme.bodyLarge),
-          SizedBox(height: 8),
-          Text(
-            '\$299',
-            style: GoogleFonts.poppins(
-              fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ],
-      ),
-    );
+    if (difference.inDays > 0) {
+      return 'In ${difference.inDays} days';
+    } else if (difference.inHours > 0) {
+      return 'In ${difference.inHours} hours';
+    } else {
+      return 'In ${difference.inMinutes} minutes';
+    }
   }
 }
