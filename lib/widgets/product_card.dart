@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/gift_service.dart';
 import '../utils/responsive_helper.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProductCard extends ConsumerWidget {
   final String? title;

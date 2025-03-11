@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/wish_list_item.dart';
 import '../providers/wish_list_provider.dart';
 import '../utils/responsive_helper.dart';
-import '../widgets/loading_overlay.dart';
 import '../widgets/search_bar.dart';
 
 class WishListScreen extends ConsumerStatefulWidget {

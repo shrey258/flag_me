@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/gift_preference.dart';
-import '../providers/gift_recommendations_provider.dart';
 import 'gift_recommendations_screen.dart';
 
 class GiftPreferencesScreen extends ConsumerStatefulWidget {
