@@ -185,10 +185,7 @@ class OccasionDetailsScreen extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GiftPreferencesScreen(
-                      occasionId: occasion.id,
-                      occasion: occasion.description,
-                    ),
+                    builder: (context) => const GiftPreferencesScreen(),
                   ),
                 );
               },

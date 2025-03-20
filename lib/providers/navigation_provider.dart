@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum NavigationSection {
   home,
-  wishList,
+  productSearch,
+  giftPreferences,
   settings,
 }
 
@@ -24,8 +25,10 @@ final navigationLabelProvider = Provider<String>((ref) {
   switch (section) {
     case NavigationSection.home:
       return 'Home';
-    case NavigationSection.wishList:
-      return 'Wish List';
+    case NavigationSection.productSearch:
+      return 'Product Search';
+    case NavigationSection.giftPreferences:
+      return 'Gift Preferences';
     case NavigationSection.settings:
       return 'Settings';
   }
@@ -36,8 +39,10 @@ final navigationIconProvider = Provider<({String icon, String label})>((ref) {
   switch (section) {
     case NavigationSection.home:
       return (icon: 'home', label: 'Home');
-    case NavigationSection.wishList:
-      return (icon: 'favorite', label: 'Wish List');
+    case NavigationSection.productSearch:
+      return (icon: 'search', label: 'Product Search');
+    case NavigationSection.giftPreferences:
+      return (icon: 'card_giftcard', label: 'Gift Preferences');
     case NavigationSection.settings:
       return (icon: 'settings', label: 'Settings');
   }
@@ -55,9 +60,14 @@ final navigationItemsProvider = Provider<List<({
       label: 'Home',
     ),
     (
-      section: NavigationSection.wishList,
-      icon: 'favorite',
-      label: 'Wish List',
+      section: NavigationSection.productSearch,
+      icon: 'search',
+      label: 'Product Search',
+    ),
+    (
+      section: NavigationSection.giftPreferences,
+      icon: 'card_giftcard',
+      label: 'Gift Preferences',
     ),
     (
       section: NavigationSection.settings,

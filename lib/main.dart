@@ -1,40 +1,58 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'config/supabase_config.dart';
-import 'utils/responsive_helper.dart';
-import 'providers/navigation_provider.dart';
+import 'models/occasion.dart';
 import 'providers/auth_provider.dart';
-import 'screens/auth_screen.dart';
+import 'providers/navigation_provider.dart';
+import 'providers/occasions_provider.dart';
 import 'screens/add_occasion_screen.dart';
+import 'screens/auth_screen.dart';
 import 'screens/occasion_details_screen.dart';
+import 'screens/product_search_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/wish_list_screen.dart';
+import 'screens/gift_preferences_screen.dart';
+import 'utils/responsive_helper.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/hero_card.dart';
-import 'providers/occasions_provider.dart';
-import 'models/occasion.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   try {
     await dotenv.load();
-    
+    print('Environment variables loaded');
+
+    print('Initializing Supabase...');
     await Supabase.initialize(
       url: SupabaseConfig.url,
       anonKey: SupabaseConfig.anonKey,
+      debug: true,
     );
+    print('Supabase initialization completed');
+
+    final client = Supabase.instance.client;
+    print('Current session: ${client.auth.currentSession?.user.email}');
     
+    client.auth.onAuthStateChange.listen((data) {
+      print('Auth State Change:');
+      print('Event: ${data.event}');
+      print('User: ${data.session?.user.email}');
+      print('Access Token: ${data.session?.accessToken}');
+    });
+
     tz.initializeTimeZones();
+    print('Timezone initialization completed');
+
     runApp(const ProviderScope(child: MyApp()));
-  } catch (e) {
-    print('Error loading environment: $e');
+  } catch (e, stackTrace) {
+    print('Initialization error: $e');
+    print('Stack trace: $stackTrace');
+    rethrow;
   }
 }
 
@@ -44,7 +62,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    
+
     return MaterialApp(
       title: 'Flag Me',
       scrollBehavior: const MaterialScrollBehavior().copyWith(
@@ -115,8 +133,10 @@ class MainScreen extends ConsumerWidget {
     switch (section) {
       case NavigationSection.home:
         return const HomePage();
-      case NavigationSection.wishList:
-        return const WishListScreen();
+      case NavigationSection.productSearch:
+        return const ProductSearchScreen();
+      case NavigationSection.giftPreferences:
+        return const GiftPreferencesScreen();
       case NavigationSection.settings:
         return const SettingsScreen();
     }
@@ -277,8 +297,8 @@ class HomePage extends ConsumerWidget {
         Text(
           'Upcoming Occasions',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: ResponsiveHelper.isMobile(context) ? 24 : 28,
-          ),
+                fontSize: ResponsiveHelper.isMobile(context) ? 24 : 28,
+              ),
         ),
         const SizedBox(height: 16),
         if (ResponsiveHelper.isMobile(context))
@@ -375,8 +395,8 @@ class HomePage extends ConsumerWidget {
         subtitle: Text(
           '${_getTimeUntil(occasion.date)} • ${occasion.relationType.name}',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontSize: ResponsiveHelper.isMobile(context) ? 14 : 16,
-          ),
+                fontSize: ResponsiveHelper.isMobile(context) ? 14 : 16,
+              ),
         ),
         trailing: Icon(
           Icons.chevron_right,

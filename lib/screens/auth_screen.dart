@@ -42,6 +42,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
+        print('Submitting auth form - Mode: $_authMode');
+        print('Email: ${_emailController.text.trim()}');
+        
         if (_authMode == AuthMode.login) {
           await ref.read(authStateProvider.notifier).signIn(
                 _emailController.text.trim(),
@@ -54,11 +57,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               );
         }
       } catch (e) {
+        print('Auth form submission error: $e');
         if (mounted) {
+          String errorMessage = 'Authentication failed';
+          
+          if (e.toString().contains('Invalid login credentials')) {
+            errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+          } else if (e.toString().contains('Email not confirmed')) {
+            errorMessage = 'Please verify your email address before logging in.';
+          } else if (e.toString().contains('User already registered')) {
+            errorMessage = 'An account with this email already exists. Please try logging in.';
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.toString()),
-              backgroundColor: Colors.red,
+              content: Text(errorMessage),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           );
         }

@@ -1,0 +1,2 @@
+C:/Users/hardi/Documents/GitHub/flag_me_ecospace/flag_me/android/app/.cxx/Debug/5h4s4t3y/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/hardi/Documents/GitHub/flag_me_ecospace/flag_me/android/app/.cxx/Debug/5h4s4t3y/arm64-v8a/CMakeFiles/rebuild_cache.dir

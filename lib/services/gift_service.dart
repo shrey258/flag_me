@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/gift_preference.dart';
 
 class GiftService {
-  static const String baseUrl = 'http://localhost:8000';
+  static const String baseUrl = 'http://192.168.1.7:8000';
 
   Future<List<String>> getGiftSuggestions(GiftPreference preference) async {
     try {
