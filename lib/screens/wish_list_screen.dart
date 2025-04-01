@@ -160,7 +160,7 @@ class _WishListScreenState extends ConsumerState<WishListScreen>
             ),
           ),
           Text(
-            'Total: \$${totalValue.toStringAsFixed(2)}',
+            'Total: ₹${totalValue.toStringAsFixed(2)}',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               color: Theme.of(context).colorScheme.primary,
@@ -299,7 +299,7 @@ class _WishListGridItem extends ConsumerWidget {
                   Row(
                     children: [
                       Text(
-                        '\$${item.price.toStringAsFixed(2)}',
+                        '₹${item.price.toStringAsFixed(2)}',
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.primary,
@@ -391,7 +391,7 @@ class _WishListListItem extends ConsumerWidget {
                   Row(
                     children: [
                       Text(
-                        '\$${item.price.toStringAsFixed(2)}',
+                        '₹${item.price.toStringAsFixed(2)}',
                         style: GoogleFonts.poppins(
                           fontWeight: FontWeight.w600,
                           color: Theme.of(context).colorScheme.primary,

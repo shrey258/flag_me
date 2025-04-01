@@ -19,11 +19,18 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
   final TextEditingController _additionalNotesController = TextEditingController();
   final TextEditingController _occasionController = TextEditingController();
   String? _selectedGender;
-  String? _selectedBudget;
   String? _selectedRelationship;
   final List<String> _interests = [];
 
-  final List<String> _budgetOptions = ['low', 'medium', 'high'];
+  // Budget range values
+  RangeValues _budgetRange = const RangeValues(1000, 5000);
+  static const double _minBudgetValue = 0;
+  static const double _maxBudgetValue = 500000;
+
+  // Text controllers for manual budget entry
+  final TextEditingController _minBudgetController = TextEditingController(text: '1000');
+  final TextEditingController _maxBudgetController = TextEditingController(text: '5000');
+
   final List<String> _relationshipOptions = [
     'friend',
     'family',
@@ -55,7 +62,8 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
         gender: _selectedGender,
         interests: _interests,
         occasion: _occasionController.text,
-        budget: _selectedBudget,
+        minBudget: _budgetRange.start,
+        maxBudget: _budgetRange.end,
         relationship: _selectedRelationship,
         additionalNotes: _additionalNotesController.text,
       );
@@ -242,23 +250,122 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
                             theme,
                             title: 'Gift Details',
                             children: [
-                              DropdownButtonFormField<String>(
-                                value: _selectedBudget,
-                                decoration: InputDecoration(
-                                  labelText: 'Budget Range',
-                                  labelStyle: GoogleFonts.inter(),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Budget Range: ₹${_budgetRange.start.toInt()} - ₹${_budgetRange.end.toInt()}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: theme.colorScheme.secondary,
+                                    ),
                                   ),
-                                ),
-                                items: _budgetOptions.map((budget) => DropdownMenuItem(
-                                  value: budget,
-                                  child: Text(
-                                    budget.toUpperCase(),
-                                    style: GoogleFonts.inter(),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Manual budget entry text fields
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _minBudgetController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            labelText: 'Min Budget (₹)',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          ),
+                                          onChanged: (value) {
+                                            if (value.isNotEmpty) {
+                                              final minValue = double.tryParse(value) ?? _minBudgetValue;
+                                              setState(() {
+                                                _budgetRange = RangeValues(
+                                                  minValue.clamp(_minBudgetValue, _budgetRange.end),
+                                                  _budgetRange.end
+                                                );
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: _maxBudgetController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                            labelText: 'Max Budget (₹)',
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          ),
+                                          onChanged: (value) {
+                                            if (value.isNotEmpty) {
+                                              final maxValue = double.tryParse(value) ?? _maxBudgetValue;
+                                              setState(() {
+                                                _budgetRange = RangeValues(
+                                                  _budgetRange.start,
+                                                  maxValue.clamp(_budgetRange.start, _maxBudgetValue)
+                                                );
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )).toList(),
-                                onChanged: (value) => setState(() => _selectedBudget = value),
+                                  
+                                  const SizedBox(height: 16),
+                                  SliderTheme(
+                                    data: SliderThemeData(
+                                      activeTrackColor: theme.colorScheme.primary,
+                                      inactiveTrackColor: theme.colorScheme.primary.withOpacity(0.2),
+                                      thumbColor: theme.colorScheme.primary,
+                                      overlayColor: theme.colorScheme.primary.withOpacity(0.2),
+                                      valueIndicatorColor: theme.colorScheme.primary,
+                                      valueIndicatorTextStyle: GoogleFonts.inter(
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    child: RangeSlider(
+                                      values: _budgetRange,
+                                      min: _minBudgetValue,
+                                      max: _maxBudgetValue,
+                                      divisions: 100,
+                                      labels: RangeLabels(
+                                        '₹${_budgetRange.start.toInt()}',
+                                        '₹${_budgetRange.end.toInt()}',
+                                      ),
+                                      onChanged: (RangeValues values) {
+                                        setState(() {
+                                          _budgetRange = values;
+                                          _minBudgetController.text = values.start.toInt().toString();
+                                          _maxBudgetController.text = values.end.toInt().toString();
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '₹${_minBudgetValue.toInt()}',
+                                        style: GoogleFonts.inter(
+                                          color: theme.colorScheme.secondary.withOpacity(0.7),
+                                        ),
+                                      ),
+                                      Text(
+                                        '₹${_maxBudgetValue.toInt()}',
+                                        style: GoogleFonts.inter(
+                                          color: theme.colorScheme.secondary.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 16),
                               DropdownButtonFormField<String>(
@@ -355,6 +462,8 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
     _interestsController.dispose();
     _additionalNotesController.dispose();
     _occasionController.dispose();
+    _minBudgetController.dispose();
+    _maxBudgetController.dispose();
     super.dispose();
   }
 }

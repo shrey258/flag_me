@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import '../models/gift_preference.dart';
 
 class GiftService {
-  static const String baseUrl = 'http://192.168.1.7:8000';
+  static const String baseUrl = 'http://192.168.190.182:8000';
 
   Future<List<String>> getGiftSuggestions(GiftPreference preference) async {
     try {
@@ -28,12 +28,24 @@ class GiftService {
     }
   }
 
-  Future<List<ProductSearchResult>> searchProducts(String query) async {
+  Future<List<ProductSearchResult>> searchProducts(String query, {double? minPrice, double? maxPrice}) async {
     try {
+      final Map<String, dynamic> requestBody = {
+        'query': query,
+      };
+      
+      if (minPrice != null) {
+        requestBody['min_price'] = minPrice;
+      }
+      
+      if (maxPrice != null) {
+        requestBody['max_price'] = maxPrice;
+      }
+      
       final response = await http.post(
         Uri.parse('$baseUrl/search-products'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'query': query}),
+        body: jsonEncode(requestBody),
       );
 
       if (response.statusCode == 200) {

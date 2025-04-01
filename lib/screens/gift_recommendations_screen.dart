@@ -210,7 +210,10 @@ class _GiftRecommendationsScreenState extends ConsumerState<GiftRecommendationsS
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ProductSearchScreen(),
+                          builder: (context) => ProductSearchScreen(
+                            minBudget: widget.preference.minBudget,
+                            maxBudget: widget.preference.maxBudget,
+                          ),
                         ),
                       );
                     },
@@ -267,6 +270,8 @@ class _GiftRecommendationsScreenState extends ConsumerState<GiftRecommendationsS
                 MaterialPageRoute(
                   builder: (context) => ProductSearchScreen(
                     searchQuery: recommendation['title'],
+                    minBudget: widget.preference.minBudget,
+                    maxBudget: widget.preference.maxBudget,
                   ),
                 ),
               );

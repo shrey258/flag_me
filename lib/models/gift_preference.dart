@@ -7,6 +7,8 @@ class GiftPreference {
   final List<String> interests;
   final String? occasion;
   final String? budget;
+  final double? minBudget;
+  final double? maxBudget;
   final String? relationship;
   final String? additionalNotes;
 
@@ -16,6 +18,8 @@ class GiftPreference {
     this.interests = const [],
     this.occasion,
     this.budget,
+    this.minBudget,
+    this.maxBudget,
     this.relationship,
     this.additionalNotes,
   });
@@ -26,6 +30,8 @@ class GiftPreference {
     'interests': interests,
     'occasion': occasion,
     'budget': budget,
+    'min_budget': minBudget,
+    'max_budget': maxBudget,
     'relationship': relationship,
     'additional_notes': additionalNotes,
   };
@@ -37,6 +43,8 @@ class GiftPreference {
       interests: List<String>.from(json['interests'] ?? []),
       occasion: json['occasion'] as String?,
       budget: json['budget'] as String?,
+      minBudget: json['min_budget'] != null ? (json['min_budget'] as num).toDouble() : null,
+      maxBudget: json['max_budget'] != null ? (json['max_budget'] as num).toDouble() : null,
       relationship: json['relationship'] as String?,
       additionalNotes: json['additional_notes'] as String?,
     );

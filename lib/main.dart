@@ -114,7 +114,10 @@ class MainScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.background,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        child: _buildCurrentSection(currentSection),
+        child: KeyedSubtree(
+          key: ValueKey<NavigationSection>(currentSection),
+          child: _buildCurrentSection(currentSection),
+        ),
         transitionBuilder: (child, animation) {
           return FadeTransition(
             opacity: animation,
@@ -132,13 +135,13 @@ class MainScreen extends ConsumerWidget {
   Widget _buildCurrentSection(NavigationSection section) {
     switch (section) {
       case NavigationSection.home:
-        return const HomePage();
+        return const HomePage(key: PageStorageKey('home_page'));
       case NavigationSection.productSearch:
-        return const ProductSearchScreen();
+        return const ProductSearchScreen(key: PageStorageKey('product_search'));
       case NavigationSection.giftPreferences:
-        return const GiftPreferencesScreen();
+        return const GiftPreferencesScreen(key: PageStorageKey('gift_preferences'));
       case NavigationSection.settings:
-        return const SettingsScreen();
+        return const SettingsScreen(key: PageStorageKey('settings'));
     }
   }
 
