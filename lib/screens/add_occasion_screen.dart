@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dart:ui';
-import '../utils/responsive_helper.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/occasions_provider.dart';
-import '../models/occasion.dart';
-import '../models/enums.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uuid/uuid.dart';
+
+import '../models/enums.dart';
+import '../models/occasion.dart';
+import '../providers/occasions_provider.dart';
+import '../utils/responsive_helper.dart';
 
 class AddOccasionScreen extends ConsumerStatefulWidget {
   const AddOccasionScreen({super.key});
@@ -22,6 +22,7 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
   String? _selectedRelationType;
   final _nameController = TextEditingController();
   final _occasionController = TextEditingController();
+  bool _isLoading = false;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -42,8 +43,8 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: Theme.of(context).colorScheme.primary,
-            ),
+                  primary: Theme.of(context).colorScheme.primary,
+                ),
           ),
           child: child!,
         );
@@ -82,32 +83,46 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: theme.colorScheme.background,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.medium(
+          SliverAppBar.large(
+            floating: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(
-              'Add New Occasion',
-              style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.secondary,
-                fontWeight: FontWeight.bold,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(
+                'Add New Occasion',
+                style: GoogleFonts.poppins(
+                  color: theme.colorScheme.secondary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-          SliverPadding(
-            padding: ResponsiveHelper.getScreenPadding(context),
-            sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Center(
                 child: Container(
                   constraints: BoxConstraints(
                     maxWidth: ResponsiveHelper.getCardWidth(context),
                   ),
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: _buildForm(context),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: _buildForm(context),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -123,15 +138,18 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
     required String label,
     required IconData icon,
   }) {
+    final theme = Theme.of(context);
+
     return Container(
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -139,17 +157,23 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
         controller: controller,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          labelStyle: GoogleFonts.inter(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+          prefixIcon: Icon(icon, color: theme.colorScheme.primary),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
+        style: GoogleFonts.inter(),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'This field is required';
+            return 'Please enter $label';
           }
           return null;
         },
@@ -163,15 +187,18 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
     required IconData icon,
     required List<String> items,
   }) {
+    final theme = Theme.of(context);
+
     return Container(
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -179,18 +206,25 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
         value: value,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
+          labelStyle: GoogleFonts.inter(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+          prefixIcon: Icon(icon, color: theme.colorScheme.primary),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
-        items: items.map((String type) {
+        style: GoogleFonts.inter(),
+        dropdownColor: theme.colorScheme.surface,
+        items: items.map((String item) {
           return DropdownMenuItem<String>(
-            value: type,
-            child: Text(type),
+            value: item,
+            child: Text(item),
           );
         }).toList(),
         onChanged: (String? newValue) {
@@ -200,7 +234,7 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
         },
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please select a relationship type';
+            return 'Please select $label';
           }
           return null;
         },
@@ -209,29 +243,39 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
   }
 
   Widget _buildDatePicker(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () => _selectDate(context),
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: () => _selectDate(context),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: 'Date',
+            labelStyle: GoogleFonts.inter(
+              color: theme.colorScheme.onSurface.withOpacity(0.7),
+            ),
+            prefixIcon:
+                Icon(Icons.calendar_today, color: theme.colorScheme.primary),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: theme.colorScheme.surface,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -240,8 +284,9 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
                 _selectedDate == null
                     ? 'Select Date'
                     : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                style: GoogleFonts.inter(),
               ),
-              const Icon(Icons.calendar_today),
+              const SizedBox(width: 8),
             ],
           ),
         ),
@@ -262,28 +307,58 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
     }
   }
 
-  void _saveOccasion() {
+  Future<void> _saveOccasion() async {
     if (_formKey.currentState!.validate() && _selectedDate != null) {
-      final occasion = Occasion(
-        id: const Uuid().v4(),
-        personName: _nameController.text,
-        date: _selectedDate!,
-        relationType: _getRelationType(_selectedRelationType),
-        description: _occasionController.text,
-        reminders: [], // Initialize with empty reminders
-      );
+      // Set loading state
+      setState(() {
+        _isLoading = true;
+      });
+      
+      try {
+        final occasion = Occasion(
+          id: const Uuid().v4(),
+          personName: _nameController.text,
+          date: _selectedDate!,
+          relationType: _getRelationType(_selectedRelationType),
+          description: _occasionController.text,
+          reminders: [], // Initialize with empty reminders
+        );
 
-      ref.read(occasionsProvider.notifier).addOccasion(occasion);
-      
-      // Debug print
-      print('Saved occasion: ${occasion.personName}');
-      print('Current occasions: ${ref.read(occasionsProvider).length}');
-      
-      Navigator.pop(context);
+        // Save to Supabase via the provider
+        await ref.read(occasionsProvider.notifier).addOccasion(occasion);
+
+        // Debug print
+        print('Saved occasion: ${occasion.personName}');
+        print('Current occasions: ${ref.read(occasionsProvider).length}');
+
+        // Only navigate if the widget is still mounted
+        if (mounted) {
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to save occasion: $e'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      } finally {
+        // Reset loading state if widget is still mounted
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
   Widget _buildForm(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Form(
       key: _formKey,
       child: Column(
@@ -291,70 +366,115 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
         children: [
           Text(
             'Event Details',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          SizedBox(height: 24),
-          _buildInputField(
-            controller: _nameController,
-            label: 'Person\'s Name',
-            icon: Icons.person_outline,
-          ),
-          SizedBox(height: 16),
-          _buildDropdownField(
-            value: _selectedRelationType,
-            label: 'Relationship Type',
-            icon: Icons.people_outline,
-            items: _relationTypes,
-          ),
-          SizedBox(height: 16),
-          _buildInputField(
-            controller: _occasionController,
-            label: 'Occasion',
-            icon: Icons.celebration_outlined,
-          ),
-          SizedBox(height: 16),
-          _buildDatePicker(context),
-          SizedBox(height: 32),
-          Container(
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).colorScheme.primary,
-                  Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: Offset(0, 6),
-                ),
-              ],
+            style: GoogleFonts.poppins(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.secondary,
             ),
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            theme,
+            title: 'Person Information',
+            children: [
+              _buildInputField(
+                controller: _nameController,
+                label: 'Person\'s Name',
+                icon: Icons.person_outline,
+              ),
+              const SizedBox(height: 16),
+              _buildDropdownField(
+                value: _selectedRelationType,
+                label: 'Relationship Type',
+                icon: Icons.people_outline,
+                items: _relationTypes,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildSection(
+            theme,
+            title: 'Occasion Details',
+            children: [
+              _buildInputField(
+                controller: _occasionController,
+                label: 'Occasion',
+                icon: Icons.celebration_outlined,
+              ),
+              const SizedBox(height: 16),
+              _buildDatePicker(context),
+            ],
+          ),
+          const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
             child: ElevatedButton(
-              onPressed: _saveOccasion,
+              onPressed: _isLoading ? null : _saveOccasion,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 2,
+                disabledBackgroundColor: theme.colorScheme.primary.withOpacity(0.5),
               ),
-              child: Text(
-                'Save Occasion',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+              child: _isLoading
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Saving...',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      'Save Occasion',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSection(
+    ThemeData theme, {
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.secondary,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...children,
+      ],
     );
   }
 }

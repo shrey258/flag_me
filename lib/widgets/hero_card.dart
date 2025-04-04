@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../utils/responsive_helper.dart';
 
 class HeroCard extends StatelessWidget {
@@ -22,7 +23,8 @@ class HeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: padding ?? EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 24 : 32),
+      padding: padding ??
+          EdgeInsets.all(ResponsiveHelper.isMobile(context) ? 24 : 32),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -50,7 +52,7 @@ class HeroCard extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: ResponsiveHelper.isMobile(context) ? 24 : 32,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.secondary,
+              color: Colors.black, // Changed to black for better contrast
             ),
             textAlign: TextAlign.center,
           ),
@@ -58,8 +60,10 @@ class HeroCard extends StatelessWidget {
             SizedBox(height: 12),
             Text(
               subtitle!,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              style: GoogleFonts.inter(
                 fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black, // Changed to black for better contrast
               ),
               textAlign: TextAlign.center,
             ),

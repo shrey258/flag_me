@@ -6,7 +6,14 @@ import '../models/gift_preference.dart';
 import 'gift_recommendations_screen.dart';
 
 class GiftPreferencesScreen extends ConsumerStatefulWidget {
-  const GiftPreferencesScreen({super.key});
+  final String? occasionId; // Optional occasion ID when coming from occasion details
+  final String? occasionName; // Optional occasion name to pre-fill
+  
+  const GiftPreferencesScreen({
+    super.key, 
+    this.occasionId,
+    this.occasionName,
+  });
 
   @override
   ConsumerState<GiftPreferencesScreen> createState() => _GiftPreferencesScreenState();
@@ -63,6 +70,15 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill occasion field if provided
+    if (widget.occasionName != null) {
+      _occasionController.text = widget.occasionName!;
+    }
+  }
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Get selected platforms
@@ -88,7 +104,10 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GiftRecommendationsScreen(preference: preference),
+          builder: (context) => GiftRecommendationsScreen(
+            preference: preference,
+            occasionId: widget.occasionId,
+          ),
         ),
       );
     }

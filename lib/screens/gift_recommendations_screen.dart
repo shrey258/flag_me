@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/gift_preference.dart';
+import '../models/gift_recommendation.dart';
 import '../utils/responsive_helper.dart';
 import '../services/gift_service.dart';
 import 'product_search_screen.dart';
 
 class GiftRecommendationsScreen extends ConsumerStatefulWidget {
   final GiftPreference preference;
-  const GiftRecommendationsScreen({super.key, required this.preference});
+  final String? occasionId; // Optional occasion ID to associate recommendations with
+  
+  const GiftRecommendationsScreen({
+    super.key, 
+    required this.preference,
+    this.occasionId,
+  });
 
   @override
   ConsumerState<GiftRecommendationsScreen> createState() => _GiftRecommendationsScreenState();
@@ -19,6 +26,34 @@ class _GiftRecommendationsScreenState extends ConsumerState<GiftRecommendationsS
   bool _isLoading = false;
   List<String> _recommendations = [];
   String? _error;
+  
+  // Helper method to save a recommendation
+  Future<void> _saveRecommendation(String title, String description) async {
+    if (widget.occasionId == null) return;
+    
+    try {
+      print('Saving recommendation: $title for occasion: ${widget.occasionId}');
+      
+      // Create recommendation object
+      final recommendation = GiftRecommendation(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        occasionId: widget.occasionId!,
+        title: title,
+        description: description,
+        price: widget.preference.maxBudget != null ? 
+          (widget.preference.minBudget! + 
+           (widget.preference.maxBudget! - widget.preference.minBudget!) * 0.7) : null,
+        imageUrl: null,
+        createdAt: DateTime.now(),
+      );
+      
+      // Save to database
+      await _giftService.saveRecommendation(recommendation);
+      print('Successfully saved recommendation');
+    } catch (e) {
+      print('Error saving recommendation: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -33,7 +68,11 @@ class _GiftRecommendationsScreenState extends ConsumerState<GiftRecommendationsS
     });
 
     try {
-      final recommendations = await _giftService.getGiftSuggestions(widget.preference);
+      // Pass the occasionId if available to store the recommendations
+      final recommendations = await _giftService.getGiftSuggestions(
+        widget.preference,
+        occasionId: widget.occasionId,
+      );
       setState(() {
         _recommendations = recommendations;
         _isLoading = false;
@@ -264,7 +303,28 @@ class _GiftRecommendationsScreenState extends ConsumerState<GiftRecommendationsS
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
+            onTap: () async {
+              // If we have an occasionId, save this recommendation
+              if (widget.occasionId != null) {
+                final title = recommendation['title'];
+                final description = recommendation['description'];
+                
+                // Create and save the recommendation
+                await _saveRecommendation(title, description);
+                
+                // Show confirmation to user
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Saved "$title" as recommendation'),
+                      backgroundColor: theme.colorScheme.primary,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+              
+              // Navigate to product search
               Navigator.push(
                 context,
                 MaterialPageRoute(

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:timezone/data/latest.dart' as tz;
 
 import 'config/supabase_config.dart';
 import 'models/occasion.dart';
@@ -12,44 +11,28 @@ import 'providers/navigation_provider.dart';
 import 'providers/occasions_provider.dart';
 import 'screens/add_occasion_screen.dart';
 import 'screens/auth_screen.dart';
+import 'screens/gift_preferences_screen.dart';
+import 'screens/message_generator_screen.dart';
 import 'screens/occasion_details_screen.dart';
 import 'screens/product_search_screen.dart';
 import 'screens/settings_screen.dart';
-import 'screens/gift_preferences_screen.dart';
-import 'screens/message_generator_screen.dart';
+import 'theme/retro_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/hero_card.dart';
-import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   try {
     await dotenv.load();
-    print('Environment variables loaded');
-
-    print('Initializing Supabase...');
+    
+    // Initialize Supabase
     await Supabase.initialize(
       url: SupabaseConfig.url,
       anonKey: SupabaseConfig.anonKey,
-      debug: true,
     );
-    print('Supabase initialization completed');
-
-    final client = Supabase.instance.client;
-    print('Current session: ${client.auth.currentSession?.user.email}');
     
-    client.auth.onAuthStateChange.listen((data) {
-      print('Auth State Change:');
-      print('Event: ${data.event}');
-      print('User: ${data.session?.user.email}');
-      print('Access Token: ${data.session?.accessToken}');
-    });
-
-    tz.initializeTimeZones();
-    print('Timezone initialization completed');
-
     runApp(const ProviderScope(child: MyApp()));
   } catch (e, stackTrace) {
     print('Initialization error: $e');
@@ -64,20 +47,18 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'Flag Me',
-      scrollBehavior: const MaterialScrollBehavior().copyWith(
-        physics: const BouncingScrollPhysics(),
-        scrollbars: true,
-      ),
-      theme: getLightTheme(),
-      darkTheme: getDarkTheme(),
-      themeMode: themeMode,
+      debugShowCheckedModeBanner: false,
+      theme: RetroTheme.getTheme(),
       home: switch (authState) {
-        Authenticated _ => const MainScreen(),
-        _ => const AuthScreen(),
+        Initial() => const AuthScreen(),
+        Loading() => const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+        Authenticated(user: _) => const MainScreen(),
+        Error() => const AuthScreen(),
       },
     );
   }
@@ -119,9 +100,11 @@ class MainScreen extends ConsumerWidget {
       case NavigationSection.productSearch:
         return const ProductSearchScreen(key: PageStorageKey('product_search'));
       case NavigationSection.giftPreferences:
-        return const GiftPreferencesScreen(key: PageStorageKey('gift_preferences'));
+        return const GiftPreferencesScreen(
+            key: PageStorageKey('gift_preferences'));
       case NavigationSection.messageGenerator:
-        return const MessageGeneratorScreen(key: PageStorageKey('message_generator'));
+        return const MessageGeneratorScreen(
+            key: PageStorageKey('message_generator'));
       case NavigationSection.settings:
         return const SettingsScreen(key: PageStorageKey('settings'));
     }
@@ -247,10 +230,18 @@ class HomePage extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.celebration_outlined,
-            size: 64,
-            color: Theme.of(context).colorScheme.primary,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: RetroTheme.blackAccent,
+              shape: BoxShape.circle,
+              border: Border.all(color: RetroTheme.goldPrimary, width: 1),
+            ),
+            child: Icon(
+              Icons.celebration_outlined,
+              size: 48,
+              color: RetroTheme.goldPrimary,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
@@ -258,12 +249,16 @@ class HomePage extends ConsumerWidget {
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w600,
+              color: RetroTheme.textLight,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add your first occasion to get started!',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: RetroTheme.textMuted,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -281,9 +276,11 @@ class HomePage extends ConsumerWidget {
       children: [
         Text(
           'Upcoming Occasions',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: ResponsiveHelper.isMobile(context) ? 24 : 28,
-              ),
+          style: GoogleFonts.poppins(
+            fontSize: ResponsiveHelper.isMobile(context) ? 24 : 28,
+            fontWeight: FontWeight.w600,
+            color: RetroTheme.goldPrimary,
+          ),
         ),
         const SizedBox(height: 16),
         if (ResponsiveHelper.isMobile(context))
@@ -293,10 +290,10 @@ class HomePage extends ConsumerWidget {
                   (occasion) => Dismissible(
                     key: Key(occasion.id),
                     background: Container(
-                      color: Colors.red.shade100,
+                      color: RetroTheme.blackAccent,
                       alignment: Alignment.centerRight,
                       padding: const EdgeInsets.only(right: 16),
-                      child: const Icon(Icons.delete, color: Colors.red),
+                      child: Icon(Icons.delete, color: RetroTheme.errorColor),
                     ),
                     onDismissed: (direction) {
                       ref
@@ -319,15 +316,172 @@ class HomePage extends ConsumerWidget {
                     child: Dismissible(
                       key: Key(occasion.id),
                       background: Container(
-                        color: Colors.red.shade100,
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 16),
-                        child: const Icon(Icons.delete, color: Colors.red),
+                        decoration: BoxDecoration(
+                          color: RetroTheme.blackAccent,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: RetroTheme.errorColor.withOpacity(0.5), width: 1),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete, color: RetroTheme.errorColor),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Delete',
+                              style: GoogleFonts.poppins(
+                                color: RetroTheme.errorColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      onDismissed: (direction) {
-                        ref
-                            .read(occasionsProvider.notifier)
-                            .deleteOccasion(occasion.id);
+                      secondaryBackground: Container(
+                        decoration: BoxDecoration(
+                          color: RetroTheme.blackAccent,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: RetroTheme.goldPrimary.withOpacity(0.5), width: 1),
+                        ),
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              'View Details',
+                              style: GoogleFonts.poppins(
+                                color: RetroTheme.goldPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(Icons.arrow_forward_ios, color: RetroTheme.goldPrimary),
+                          ],
+                        ),
+                      ),
+                      dismissThresholds: const {DismissDirection.endToStart: 0.5, DismissDirection.startToEnd: 0.5},
+                      direction: DismissDirection.horizontal,
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.endToStart) {
+                          return await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                backgroundColor: RetroTheme.blackLight,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                title: Row(
+                                  children: [
+                                    Icon(Icons.warning_amber_rounded, color: RetroTheme.errorColor),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Delete Occasion',
+                                      style: GoogleFonts.poppins(
+                                        color: RetroTheme.textLight,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  'Are you sure you want to delete ${occasion.personName}\'s ${occasion.description}?',
+                                  style: GoogleFonts.inter(
+                                    color: RetroTheme.textLight,
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                    child: Text(
+                                      'Cancel',
+                                      style: GoogleFonts.poppins(
+                                        color: RetroTheme.goldPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: RetroTheme.errorColor,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                    child: Text(
+                                      'Delete',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else if (direction == DismissDirection.startToEnd) {
+                          // Navigate to occasion details screen (left-to-right swipe)
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OccasionDetailsScreen(
+                                  occasionId: occasion.id,
+                                  relationType: occasion.relationType,
+                                ),
+                              ),
+                            );
+                          }
+                          return false; // Don't dismiss the item
+                        }
+                        return false;
+                      },
+                      onDismissed: (direction) async {
+                        try {
+                          // Show loading indicator
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(RetroTheme.textLight),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text('Deleting occasion...'),
+                                ],
+                              ),
+                              backgroundColor: RetroTheme.blackAccent,
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                          
+                          // Delete occasion from Supabase
+                          await ref
+                              .read(occasionsProvider.notifier)
+                              .deleteOccasion(occasion.id);
+                              
+                          // Show success message
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Occasion deleted successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          // Show error message
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to delete occasion: $e'),
+                                backgroundColor: RetroTheme.errorColor,
+                              ),
+                            );
+                          }
+                        }
                       },
                       child: _buildOccasionCard(context, occasion),
                     ),
@@ -343,13 +497,15 @@ class HomePage extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: RetroTheme.blackLight,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: RetroTheme.goldPrimary.withOpacity(0.5), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -361,12 +517,13 @@ class HomePage extends ConsumerWidget {
           width: ResponsiveHelper.isMobile(context) ? 48 : 64,
           height: ResponsiveHelper.isMobile(context) ? 48 : 64,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.tertiary,
+            color: RetroTheme.blackAccent,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: RetroTheme.goldPrimary, width: 1),
           ),
           child: Icon(
             Icons.cake,
-            color: Theme.of(context).colorScheme.primary,
+            color: RetroTheme.goldPrimary,
             size: ResponsiveHelper.isMobile(context) ? 24 : 32,
           ),
         ),
@@ -375,17 +532,20 @@ class HomePage extends ConsumerWidget {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.w600,
             fontSize: ResponsiveHelper.isMobile(context) ? 16 : 18,
+            color: RetroTheme.textLight,
           ),
         ),
         subtitle: Text(
           '${_getTimeUntil(occasion.date)} • ${occasion.relationType.name}',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: ResponsiveHelper.isMobile(context) ? 14 : 16,
-              ),
+          style: GoogleFonts.poppins(
+            fontSize: ResponsiveHelper.isMobile(context) ? 14 : 16,
+            color: RetroTheme.goldPrimary,
+            fontWeight: FontWeight.w400,
+          ),
         ),
         trailing: Icon(
           Icons.chevron_right,
-          color: Theme.of(context).colorScheme.primary,
+          color: RetroTheme.goldPrimary,
           size: ResponsiveHelper.isMobile(context) ? 24 : 28,
         ),
         onTap: () {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import '../providers/auth_provider.dart';
 import '../utils/responsive_helper.dart';
 
@@ -32,7 +33,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   void _switchAuthMode() {
     setState(() {
-      _authMode = _authMode == AuthMode.login ? AuthMode.signup : AuthMode.login;
+      _authMode =
+          _authMode == AuthMode.login ? AuthMode.signup : AuthMode.login;
       _emailController.clear();
       _passwordController.clear();
       _confirmPasswordController.clear();
@@ -44,7 +46,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       try {
         print('Submitting auth form - Mode: $_authMode');
         print('Email: ${_emailController.text.trim()}');
-        
+
         if (_authMode == AuthMode.login) {
           await ref.read(authStateProvider.notifier).signIn(
                 _emailController.text.trim(),
@@ -60,15 +62,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         print('Auth form submission error: $e');
         if (mounted) {
           String errorMessage = 'Authentication failed';
-          
+
           if (e.toString().contains('Invalid login credentials')) {
-            errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+            errorMessage =
+                'Invalid email or password. Please check your credentials and try again.';
           } else if (e.toString().contains('Email not confirmed')) {
-            errorMessage = 'Please verify your email address before logging in.';
+            errorMessage =
+                'Please verify your email address before logging in.';
           } else if (e.toString().contains('User already registered')) {
-            errorMessage = 'An account with this email already exists. Please try logging in.';
+            errorMessage =
+                'An account with this email already exists. Please try logging in.';
           }
-          
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(errorMessage),
@@ -107,7 +112,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final isSmallScreen = ResponsiveHelper.isMobile(context);
     final containerWidth = ResponsiveHelper.getCardWidth(context);
     final padding = ResponsiveHelper.getScreenPadding(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
       body: Container(
@@ -140,7 +145,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withOpacity(0.15),
+                              color:
+                                  theme.colorScheme.primary.withOpacity(0.15),
                               blurRadius: 40,
                               offset: const Offset(0, 20),
                               spreadRadius: 10,
@@ -148,7 +154,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           ],
                         ),
                         child: Image.asset(
-                          'assets/logo.png',
+                          'assets/logo_big.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -221,11 +227,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Email',
                                 labelStyle: GoogleFonts.inter(
-                                  color: theme.colorScheme.secondary.withOpacity(0.7),
+                                  color: theme.colorScheme.secondary
+                                      .withOpacity(0.7),
                                 ),
                                 hintText: 'Enter your email',
                                 hintStyle: GoogleFonts.inter(
-                                  color: theme.colorScheme.secondary.withOpacity(0.5),
+                                  color: theme.colorScheme.secondary
+                                      .withOpacity(0.5),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.email_outlined,
@@ -238,7 +246,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(
-                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                    color: theme.colorScheme.primary
+                                        .withOpacity(0.3),
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
@@ -273,7 +282,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your email';
                                 }
-                                if (!value.contains('@') || !value.contains('.')) {
+                                if (!value.contains('@') ||
+                                    !value.contains('.')) {
                                   return 'Please enter a valid email';
                                 }
                                 return null;
@@ -293,11 +303,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               decoration: InputDecoration(
                                 labelText: 'Password',
                                 labelStyle: GoogleFonts.inter(
-                                  color: theme.colorScheme.secondary.withOpacity(0.7),
+                                  color: theme.colorScheme.secondary
+                                      .withOpacity(0.7),
                                 ),
                                 hintText: 'Enter your password',
                                 hintStyle: GoogleFonts.inter(
-                                  color: theme.colorScheme.secondary.withOpacity(0.5),
+                                  color: theme.colorScheme.secondary
+                                      .withOpacity(0.5),
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock_outline,
@@ -324,7 +336,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(16),
                                   borderSide: BorderSide(
-                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                    color: theme.colorScheme.primary
+                                        .withOpacity(0.3),
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
@@ -380,11 +393,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 decoration: InputDecoration(
                                   labelText: 'Confirm Password',
                                   labelStyle: GoogleFonts.inter(
-                                    color: theme.colorScheme.secondary.withOpacity(0.7),
+                                    color: theme.colorScheme.secondary
+                                        .withOpacity(0.7),
                                   ),
                                   hintText: 'Confirm your password',
                                   hintStyle: GoogleFonts.inter(
-                                    color: theme.colorScheme.secondary.withOpacity(0.5),
+                                    color: theme.colorScheme.secondary
+                                        .withOpacity(0.5),
                                   ),
                                   prefixIcon: Icon(
                                     Icons.lock_outline,
@@ -401,7 +416,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                                        _obscureConfirmPassword =
+                                            !_obscureConfirmPassword;
                                       });
                                     },
                                   ),
@@ -411,7 +427,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(16),
                                     borderSide: BorderSide(
-                                      color: theme.colorScheme.primary.withOpacity(0.3),
+                                      color: theme.colorScheme.primary
+                                          .withOpacity(0.3),
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
@@ -470,14 +487,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: theme.colorScheme.primary.withOpacity(0.3),
+                                    color: theme.colorScheme.primary
+                                        .withOpacity(0.3),
                                     blurRadius: 12,
                                     offset: const Offset(0, 6),
                                   ),
                                 ],
                               ),
                               child: ElevatedButton(
-                                onPressed: authState is Loading ? null : _submitForm,
+                                onPressed:
+                                    authState is Loading ? null : _submitForm,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.black,
@@ -493,13 +512,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                         width: 24,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2.5,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
                                             theme.colorScheme.onPrimary,
                                           ),
                                         ),
                                       )
                                     : Text(
-                                        _authMode == AuthMode.login ? 'Login' : 'Sign Up',
+                                        _authMode == AuthMode.login
+                                            ? 'Login'
+                                            : 'Sign Up',
                                         style: GoogleFonts.poppins(
                                           fontSize: isSmallScreen ? 16 : 18,
                                           fontWeight: FontWeight.bold,
@@ -514,22 +536,26 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               children: [
                                 Expanded(
                                   child: Divider(
-                                    color: theme.colorScheme.secondary.withOpacity(0.2),
+                                    color: theme.colorScheme.secondary
+                                        .withOpacity(0.2),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
                                   child: Text(
                                     'OR',
                                     style: GoogleFonts.inter(
-                                      color: theme.colorScheme.secondary.withOpacity(0.5),
+                                      color: theme.colorScheme.secondary
+                                          .withOpacity(0.5),
                                       fontSize: isSmallScreen ? 12 : 14,
                                     ),
                                   ),
                                 ),
                                 Expanded(
                                   child: Divider(
-                                    color: theme.colorScheme.secondary.withOpacity(0.2),
+                                    color: theme.colorScheme.secondary
+                                        .withOpacity(0.2),
                                   ),
                                 ),
                               ],
@@ -538,11 +564,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                             // Social Sign In Buttons
                             OutlinedButton.icon(
-                              onPressed: authState is Loading ? null : _signInWithGoogle,
+                              onPressed: authState is Loading
+                                  ? null
+                                  : _signInWithGoogle,
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: theme.colorScheme.secondary,
                                 side: BorderSide(
-                                  color: theme.colorScheme.primary.withOpacity(0.3),
+                                  color: theme.colorScheme.primary
+                                      .withOpacity(0.3),
                                 ),
                                 padding: EdgeInsets.symmetric(
                                   vertical: isSmallScreen ? 12 : 16,
@@ -568,9 +597,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                             // Switch Auth Mode Button
                             TextButton(
-                              onPressed: authState is Loading ? null : _switchAuthMode,
+                              onPressed:
+                                  authState is Loading ? null : _switchAuthMode,
                               style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
                               ),
                               child: Text(
                                 _authMode == AuthMode.login
