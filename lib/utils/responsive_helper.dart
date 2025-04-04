@@ -10,6 +10,9 @@ class ResponsiveHelper {
 
   static bool isDesktop(BuildContext context) =>
       MediaQuery.of(context).size.width >= 1200;
+      
+  static bool isSmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < 800;
 
   static double getCardWidth(BuildContext context) {
     if (isMobile(context)) return double.infinity;

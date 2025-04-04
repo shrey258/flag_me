@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../providers/navigation_provider.dart';
 
 class BottomNavBar extends ConsumerWidget {
@@ -10,32 +11,39 @@ class BottomNavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSection = ref.watch(navigationProvider);
     final items = ref.watch(navigationItemsProvider);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, -3),
+            spreadRadius: 1,
           ),
         ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: items.map((item) {
               final isSelected = currentSection == item.section;
-              return _NavBarItem(
-                icon: item.icon,
-                label: item.label,
-                isSelected: isSelected,
-                onTap: () {
-                  ref.read(navigationProvider.notifier).navigate(item.section);
-                },
+              return Expanded(
+                child: _NavBarItem(
+                  icon: item.icon,
+                  label: item.label,
+                  isSelected: isSelected,
+                  onTap: () {
+                    ref
+                        .read(navigationProvider.notifier)
+                        .navigate(item.section);
+                  },
+                ),
               );
             }).toList(),
           ),
@@ -93,13 +101,31 @@ class _NavBarItemState extends State<_NavBarItem>
       case 'home':
         return widget.isSelected ? Icons.home : Icons.home_outlined;
       case 'card_giftcard':
-        return widget.isSelected ? Icons.card_giftcard : Icons.card_giftcard_outlined;
+        return widget.isSelected
+            ? Icons.card_giftcard
+            : Icons.card_giftcard_outlined;
       case 'search':
         return widget.isSelected ? Icons.search : Icons.search_outlined;
+      case 'message':
+        return widget.isSelected ? Icons.message : Icons.message_outlined;
       case 'settings':
         return widget.isSelected ? Icons.settings : Icons.settings_outlined;
       default:
         return Icons.error;
+    }
+  }
+
+  String _getShortLabel(String label) {
+    // Shorten long labels for better fit
+    switch (label) {
+      case 'Product Search':
+        return 'Search';
+      case 'Gift Preferences':
+        return 'Gifts';
+      case 'Message Generator':
+        return 'Messages';
+      default:
+        return label;
     }
   }
 
@@ -115,10 +141,10 @@ class _NavBarItemState extends State<_NavBarItem>
       child: ScaleTransition(
         scale: _scaleAnimation,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           decoration: BoxDecoration(
             color: widget.isSelected
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
@@ -129,21 +155,29 @@ class _NavBarItemState extends State<_NavBarItem>
                 _getIconData(),
                 color: widget.isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Colors.grey[600],
+                    : Theme.of(context).colorScheme.secondary.withOpacity(0.7),
                 size: 22,
               ),
               const SizedBox(height: 2),
-              Text(
-                widget.label,
-                style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  fontWeight:
-                      widget.isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: widget.isSelected
-                      ? Theme.of(context).colorScheme.primary
-                      : Colors.grey[600],
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  _getShortLabel(widget.label),
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight:
+                        widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: widget.isSelected
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context)
+                            .colorScheme
+                            .secondary
+                            .withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),

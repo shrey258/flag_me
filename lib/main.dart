@@ -16,9 +16,11 @@ import 'screens/occasion_details_screen.dart';
 import 'screens/product_search_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/gift_preferences_screen.dart';
+import 'screens/message_generator_screen.dart';
 import 'utils/responsive_helper.dart';
 import 'widgets/bottom_nav_bar.dart';
 import 'widgets/hero_card.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +64,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
       title: 'Flag Me',
@@ -69,32 +72,9 @@ class MyApp extends ConsumerWidget {
         physics: const BouncingScrollPhysics(),
         scrollbars: true,
       ),
-      theme: ThemeData(
-        colorScheme: ColorScheme.light(
-          primary: Color(0xFFD4AF37), // Gold
-          secondary: Color(0xFF1E1E1E), // Soft black
-          tertiary: Color(0xFFF5ECD7), // Cream
-          surface: Colors.white,
-          background: Color(0xFFFAFAFA), // Off-white
-          onPrimary: Colors.black,
-          onSecondary: Colors.white,
-        ),
-        textTheme: TextTheme(
-          headlineLarge: GoogleFonts.poppins(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1E1E1E),
-          ),
-          headlineMedium: GoogleFonts.poppins(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1E1E1E),
-          ),
-          bodyLarge: GoogleFonts.inter(fontSize: 16, color: Color(0xFF1E1E1E)),
-          bodyMedium: GoogleFonts.inter(fontSize: 14, color: Color(0xFF666666)),
-        ),
-        useMaterial3: true,
-      ),
+      theme: getLightTheme(),
+      darkTheme: getDarkTheme(),
+      themeMode: themeMode,
       home: switch (authState) {
         Authenticated _ => const MainScreen(),
         _ => const AuthScreen(),
@@ -140,6 +120,8 @@ class MainScreen extends ConsumerWidget {
         return const ProductSearchScreen(key: PageStorageKey('product_search'));
       case NavigationSection.giftPreferences:
         return const GiftPreferencesScreen(key: PageStorageKey('gift_preferences'));
+      case NavigationSection.messageGenerator:
+        return const MessageGeneratorScreen(key: PageStorageKey('message_generator'));
       case NavigationSection.settings:
         return const SettingsScreen(key: PageStorageKey('settings'));
     }

@@ -11,6 +11,7 @@ class GiftPreference {
   final double? maxBudget;
   final String? relationship;
   final String? additionalNotes;
+  final List<String>? platforms;
 
   GiftPreference({
     this.age,
@@ -22,6 +23,7 @@ class GiftPreference {
     this.maxBudget,
     this.relationship,
     this.additionalNotes,
+    this.platforms,
   });
 
   Map<String, dynamic> toJson() => {
@@ -34,6 +36,7 @@ class GiftPreference {
     'max_budget': maxBudget,
     'relationship': relationship,
     'additional_notes': additionalNotes,
+    'platforms': platforms,
   };
 
   factory GiftPreference.fromJson(Map<String, dynamic> json) {
@@ -47,6 +50,7 @@ class GiftPreference {
       maxBudget: json['max_budget'] != null ? (json['max_budget'] as num).toDouble() : null,
       relationship: json['relationship'] as String?,
       additionalNotes: json['additional_notes'] as String?,
+      platforms: json['platforms'] != null ? List<String>.from(json['platforms']) : null,
     );
   }
 }

@@ -31,6 +31,14 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
   final TextEditingController _minBudgetController = TextEditingController(text: '1000');
   final TextEditingController _maxBudgetController = TextEditingController(text: '5000');
 
+  // Platform selection
+  bool _showPlatformFilter = false;
+  final Map<String, bool> _selectedPlatforms = {
+    'Amazon': true,
+    'Flipkart': true,
+    'Myntra': true,
+  };
+
   final List<String> _relationshipOptions = [
     'friend',
     'family',
@@ -55,25 +63,32 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
     });
   }
 
-  void _getGiftSuggestions() {
+  void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      // Get selected platforms
+      List<String> platforms = _selectedPlatforms.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList();
+
       final preference = GiftPreference(
-        age: int.tryParse(_ageController.text),
+        age: _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null,
         gender: _selectedGender,
         interests: _interests,
-        occasion: _occasionController.text,
-        minBudget: _budgetRange.start,
-        maxBudget: _budgetRange.end,
+        occasion: _occasionController.text.isEmpty ? null : _occasionController.text,
+        minBudget: double.tryParse(_minBudgetController.text),
+        maxBudget: double.tryParse(_maxBudgetController.text),
         relationship: _selectedRelationship,
-        additionalNotes: _additionalNotesController.text,
+        additionalNotes: _additionalNotesController.text.isEmpty
+            ? null
+            : _additionalNotesController.text,
+        platforms: platforms.isEmpty ? null : platforms,
       );
 
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GiftRecommendationsScreen(
-            preference: preference,
-          ),
+          builder: (context) => GiftRecommendationsScreen(preference: preference),
         ),
       );
     }
@@ -401,10 +416,70 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
                             ],
                           ),
                           const SizedBox(height: 32),
+                          _buildSection(
+                            theme,
+                            title: 'Shopping Preferences',
+                            children: [
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                title: Text(
+                                  'E-commerce Platforms',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Select websites to search for gifts',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    color: theme.colorScheme.secondary.withOpacity(0.7),
+                                  ),
+                                ),
+                                trailing: Switch(
+                                  value: _showPlatformFilter,
+                                  activeColor: const Color(0xFFD4AF37),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _showPlatformFilter = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              if (_showPlatformFilter)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+                                  child: Column(
+                                    children: _selectedPlatforms.entries.map((entry) {
+                                      return CheckboxListTile(
+                                        contentPadding: EdgeInsets.zero,
+                                        title: Text(
+                                          entry.key,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        value: entry.value,
+                                        activeColor: _getPlatformColor(entry.key),
+                                        controlAffinity: ListTileControlAffinity.leading,
+                                        dense: true,
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            _selectedPlatforms[entry.key] = value ?? false;
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 32),
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _getGiftSuggestions,
+                              onPressed: _submitForm,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: Colors.black,
@@ -454,6 +529,19 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
         ...children,
       ],
     );
+  }
+
+  Color _getPlatformColor(String platform) {
+    switch (platform) {
+      case 'Amazon':
+        return Colors.orange[800]!;
+      case 'Flipkart':
+        return Colors.blue[800]!;
+      case 'Myntra':
+        return Colors.pink[700]!;
+      default:
+        return Colors.grey[700]!;
+    }
   }
 
   @override

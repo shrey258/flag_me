@@ -28,20 +28,29 @@ class GiftService {
     }
   }
 
-  Future<List<ProductSearchResult>> searchProducts(String query, {double? minPrice, double? maxPrice}) async {
+  Future<List<ProductSearchResult>> searchProducts(
+    String query, {
+    double? minPrice,
+    double? maxPrice,
+    List<String>? platforms,
+  }) async {
     try {
       final Map<String, dynamic> requestBody = {
         'query': query,
       };
-      
+
       if (minPrice != null) {
         requestBody['min_price'] = minPrice;
       }
-      
+
       if (maxPrice != null) {
         requestBody['max_price'] = maxPrice;
       }
-      
+
+      if (platforms != null && platforms.isNotEmpty) {
+        requestBody['platforms'] = platforms;
+      }
+
       final response = await http.post(
         Uri.parse('$baseUrl/search-products'),
         headers: {'Content-Type': 'application/json'},

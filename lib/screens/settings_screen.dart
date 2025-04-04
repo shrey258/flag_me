@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/hero_card.dart';
 import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -75,6 +76,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             value: _emailNotifications,
                             onChanged: (value) {
                               setState(() => _emailNotifications = value);
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: ResponsiveHelper.isMobile(context) ? 24 : 32,
+                      ),
+                      _buildSection(
+                        context,
+                        title: 'Appearance',
+                        icon: Icons.palette_outlined,
+                        children: [
+                          _buildSwitchTile(
+                            context,
+                            title: 'Dark Theme',
+                            subtitle: 'Enable dark mode for the application',
+                            value: ref.watch(themeModeProvider) == ThemeMode.dark,
+                            onChanged: (value) {
+                              ref.read(themeModeProvider.notifier).setThemeMode(
+                                    value ? ThemeMode.dark : ThemeMode.light,
+                                  );
                             },
                           ),
                         ],
@@ -235,7 +257,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
