@@ -7,7 +7,7 @@ import '../models/gift_preference.dart';
 import '../models/gift_recommendation.dart';
 
 class GiftService {
-  static const String baseUrl = 'http://192.168.190.182:8000';
+  static const String baseUrl = 'http://172.20.10.9:8000';
   final _supabase = Supabase.instance.client;
   static const String _tableName = 'gift_recommendations';
 

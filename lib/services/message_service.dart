@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class MessageService {
-  static const String baseUrl = 'http://192.168.190.182:8000';
+  static const String baseUrl = 'http://172.20.10.9:8000';
 
   Future<String> generateMessage({
     required String name,

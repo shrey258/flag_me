@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/supabase_config.dart';
 import 'models/occasion.dart';
@@ -16,6 +17,7 @@ import 'screens/message_generator_screen.dart';
 import 'screens/occasion_details_screen.dart';
 import 'screens/product_search_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'theme/retro_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'widgets/bottom_nav_bar.dart';
@@ -41,25 +43,47 @@ void main() async {
   }
 }
 
+// Provider for onboarding state
+final onboardingCompletedProvider = FutureProvider<bool>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('onboarding_completed') ?? false;
+});
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
+    final onboardingCompleted = ref.watch(onboardingCompletedProvider);
 
     return MaterialApp(
       title: 'Flag Me',
       debugShowCheckedModeBanner: false,
       theme: RetroTheme.getTheme(),
-      home: switch (authState) {
-        Initial() => const AuthScreen(),
-        Loading() => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+      home: onboardingCompleted.when(
+        data: (completed) {
+          if (!completed) {
+            return const OnboardingScreen();
+          }
+          
+          return switch (authState) {
+            Initial() => const AuthScreen(),
+            Loading() => const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+            Authenticated(user: _) => const MainScreen(),
+            Error() => const AuthScreen(),
+          };
+        },
+        loading: () => const Scaffold(
+          backgroundColor: RetroTheme.blackPrimary,
+          body: Center(child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(RetroTheme.goldPrimary),
+          )),
         ),
-        Authenticated(user: _) => const MainScreen(),
-        Error() => const AuthScreen(),
-      },
+        error: (_, __) => const AuthScreen(),
+      ),
     );
   }
 }
