@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-import 'enums.dart';
 
 class GiftPreference {
   final int? age;

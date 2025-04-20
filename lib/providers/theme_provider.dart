@@ -46,13 +46,11 @@ ThemeData getLightTheme() {
       primary: const Color(0xFFD4AF37), // Gold
       secondary: const Color(0xFF1E1E1E), // Soft black
       tertiary: const Color(0xFFF5ECD7), // Cream
-      surface: Colors.white,
-      background: const Color(0xFFFAFAFA), // Off-white
+      surface: Colors.white, // Off-white
       onPrimary: Colors.black,
       onSecondary: Colors.white,
       onTertiary: const Color(0xFF1E1E1E),
       onSurface: const Color(0xFF1E1E1E),
-      onBackground: const Color(0xFF1E1E1E),
     ),
     textTheme: TextTheme(
       headlineLarge: GoogleFonts.poppins(
@@ -156,34 +154,34 @@ ThemeData getLightTheme() {
       overlayColor: const Color(0xFFD4AF37).withOpacity(0.2),
     ),
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return null;
       }),
-      checkColor: MaterialStateProperty.all(Colors.black),
+      checkColor: WidgetStateProperty.all(Colors.black),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
     ),
     radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return null;
       }),
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return Colors.white;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37).withOpacity(0.5);
         }
         return Colors.grey.withOpacity(0.5);
@@ -205,13 +203,11 @@ ThemeData getDarkTheme() {
       primary: const Color(0xFFD4AF37), // Gold
       secondary: const Color(0xFFE0E0E0), // Light gray for text
       tertiary: const Color(0xFF2C2C2C), // Darker surface for cards
-      surface: const Color(0xFF1E1E1E), // Dark surface
-      background: const Color(0xFF121212), // Dark background
+      surface: const Color(0xFF1E1E1E), // Dark background
       onPrimary: Colors.black,
       onSecondary: const Color(0xFF121212),
       onTertiary: Colors.white,
       onSurface: Colors.white,
-      onBackground: Colors.white,
       error: const Color(0xFFCF6679), // Material dark theme error color
     ),
     textTheme: TextTheme(
@@ -316,34 +312,34 @@ ThemeData getDarkTheme() {
       overlayColor: const Color(0xFFD4AF37).withOpacity(0.2),
     ),
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return null;
       }),
-      checkColor: MaterialStateProperty.all(Colors.black),
+      checkColor: WidgetStateProperty.all(Colors.black),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
     ),
     radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return null;
       }),
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37);
         }
         return Colors.white;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const Color(0xFFD4AF37).withOpacity(0.5);
         }
         return Colors.grey.withOpacity(0.5);

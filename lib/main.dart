@@ -96,7 +96,7 @@ class MainScreen extends ConsumerWidget {
     final currentSection = ref.watch(navigationProvider);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         child: KeyedSubtree(

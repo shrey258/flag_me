@@ -53,8 +53,6 @@ class RetroTheme {
         onSecondary: blackPrimary,
         tertiary: creamAccent,
         onTertiary: blackPrimary,
-        background: blackPrimary,
-        onBackground: textLight,
         surface: blackLight,
         onSurface: textLight,
         error: errorColor,
@@ -240,13 +238,13 @@ class RetroTheme {
       ),
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return goldPrimary;
           }
           return null;
         }),
-        checkColor: MaterialStateProperty.all(blackPrimary),
+        checkColor: WidgetStateProperty.all(blackPrimary),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -254,8 +252,8 @@ class RetroTheme {
       ),
       // Radio theme
       radioTheme: RadioThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return goldPrimary;
           }
           return goldPrimary.withOpacity(0.6);
@@ -263,19 +261,19 @@ class RetroTheme {
       ),
       // Switch theme
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return goldPrimary;
           }
           return textLight;
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return goldPrimary.withOpacity(0.5);
           }
           return textMuted.withOpacity(0.5);
         }),
-        trackOutlineColor: MaterialStateProperty.all(Colors.transparent),
+        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
       ),
       // Dialog theme
       dialogTheme: DialogTheme(

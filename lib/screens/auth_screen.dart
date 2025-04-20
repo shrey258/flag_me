@@ -114,7 +114,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final padding = ResponsiveHelper.getScreenPadding(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -122,7 +122,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             end: Alignment.bottomCenter,
             colors: [
               theme.colorScheme.tertiary.withOpacity(0.1),
-              theme.colorScheme.background,
+              theme.colorScheme.surface,
             ],
           ),
         ),

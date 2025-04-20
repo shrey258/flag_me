@@ -31,7 +31,7 @@ class AuthService {
       }
 
       // Verify session is stored
-      final currentSession = await _supabase.auth.currentSession;
+      final currentSession = _supabase.auth.currentSession;
       print('Current session after sign in: $currentSession');
 
       return response;

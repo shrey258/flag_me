@@ -86,7 +86,7 @@ class _AddOccasionScreenState extends ConsumerState<AddOccasionScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(

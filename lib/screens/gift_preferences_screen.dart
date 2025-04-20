@@ -119,7 +119,7 @@ class _GiftPreferencesScreenState extends ConsumerState<GiftPreferencesScreen> {
     final isSmallScreen = ResponsiveHelper.isMobile(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(

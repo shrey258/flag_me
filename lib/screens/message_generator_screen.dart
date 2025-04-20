@@ -5,7 +5,7 @@ import '../services/message_service.dart';
 import '../utils/responsive_helper.dart';
 
 class MessageGeneratorScreen extends StatefulWidget {
-  const MessageGeneratorScreen({Key? key}) : super(key: key);
+  const MessageGeneratorScreen({super.key});
 
   @override
   State<MessageGeneratorScreen> createState() => _MessageGeneratorScreenState();
@@ -120,7 +120,7 @@ class _MessageGeneratorScreenState extends State<MessageGeneratorScreen> {
     final isSmallScreen = ResponsiveHelper.isSmallScreen(context);
     
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
